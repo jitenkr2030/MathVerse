@@ -1,0 +1,87 @@
+# MathVerse Animation Engine Configuration
+
+# Rendering settings
+render_settings:
+  default_quality: "m"  # l, m, h, k (low, medium, high, 4k)
+  frame_rate: 30
+  resolution:
+    width: 1920
+    height: 1080
+  background_color: "#FFFFFF"
+  
+# Output settings
+output:
+  format: "mp4"
+  generate_thumbnails: true
+  thumbnail_time: "00:00:05"
+  output_directory: "output"
+
+# Animation settings
+animation:
+  default_duration: 2.0  # seconds
+  transition_duration: 0.5
+  wait_time: 1.0
+  
+# Color scheme (MathVerse branding)
+colors:
+  primary: "#3B82F6"      # Blue
+  secondary: "#10B981"    # Green  
+  accent: "#F59E0B"       # Amber
+  background: "#FFFFFF"   # White
+  text: "#1F2937"         # Dark gray
+  highlight: "#EF4444"    # Red
+  
+# Educational levels configuration
+levels:
+  primary:
+    font_sizes:
+      title: 48
+      subtitle: 32
+      content: 28
+    animation_speed: "slow"
+    
+  secondary:
+    font_sizes:
+      title: 44
+      subtitle: 30
+      content: 26
+    animation_speed: "medium"
+    
+  senior_secondary:
+    font_sizes:
+      title: 40
+      subtitle: 28
+      content: 24
+    animation_speed: "medium"
+    
+  undergraduate:
+    font_sizes:
+      title: 36
+      subtitle: 26
+      content: 22
+    animation_speed: "fast"
+    
+  postgraduate:
+    font_sizes:
+      title: 32
+      subtitle: 24
+      content: 20
+    animation_speed: "fast"
+
+# Quality presets
+quality_presets:
+  l:  # Low quality - fast preview
+    resolution: [854, 480]
+    frame_rate: 15
+    
+  m:  # Medium quality - default
+    resolution: [1920, 1080]
+    frame_rate: 30
+    
+  h:  # High quality
+    resolution: [2560, 1440]
+    frame_rate: 30
+    
+  k:  # 4K quality
+    resolution: [3840, 2160]
+    frame_rate: 60
