@@ -76,16 +76,16 @@ export const Header: React.FC = () => {
                     {user?.avatar_url ? (
                       <img
                         src={user.avatar_url}
-                        alt={user.name}
+                        alt={user.full_name}
                         className="h-8 w-8 rounded-full object-cover"
                       />
                     ) : (
                       <span className="text-sm font-medium text-indigo-600">
-                        {user?.name?.charAt(0).toUpperCase() || 'U'}
+                        {user?.full_name?.charAt(0).toUpperCase() || 'U'}
                       </span>
                     )}
                   </div>
-                  <span className="text-sm font-medium">{user?.name || 'User'}</span>
+                  <span className="text-sm font-medium">{user?.full_name || 'User'}</span>
                   <svg
                     className={`h-4 w-4 transition-transform ${
                       isUserMenuOpen ? 'rotate-180' : ''

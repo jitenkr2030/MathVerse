@@ -46,7 +46,8 @@ export default function RegisterPage() {
       const response = await authService.register({
         email: data.email,
         password: data.password,
-        name: data.name,
+        username: data.name.split(' ')[0] + '_' + Math.random().toString(36).substring(7),
+        full_name: data.name,
         role: data.role as 'student' | 'creator',
       } as RegisterData);
       login(response.user, response.access_token);

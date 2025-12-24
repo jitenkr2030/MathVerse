@@ -6,7 +6,7 @@ import { useAuthStore } from '../../store';
 import Layout from '../../components/Layout';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { ProgressBar } from '../../components/ProgressBar';
+import ProgressBar from '../../components/ProgressBar';
 
 export default function CourseDetailPage() {
   const router = useRouter();
@@ -159,7 +159,7 @@ export default function CourseDetailPage() {
                   </div>
                   {isEnrolled ? (
                     <div className="space-y-3">
-                      <ProgressBar progress={0} height="h-2" />
+                      <ProgressBar value={0} size="md" />
                       <p className="text-sm text-gray-600 text-center">0% complete</p>
                       <Button fullWidth onClick={() => router.push(`/lesson/${lessons[0]?.id}`)}>
                         Continue Learning

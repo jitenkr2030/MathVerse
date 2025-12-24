@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   images: {
-    domains: ['localhost', 'mathverse.com'],
+    unoptimized: true,
   },
   async rewrites() {
     return [

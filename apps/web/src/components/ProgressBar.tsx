@@ -5,7 +5,7 @@ interface ProgressBarProps {
   value: number;
   max?: number;
   size?: 'sm' | 'md' | 'lg';
-  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'auto';
   showLabel?: boolean;
   label?: string;
   animated?: boolean;

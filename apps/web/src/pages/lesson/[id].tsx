@@ -6,9 +6,9 @@ import { useAuthStore } from '../../store';
 import Layout from '../../components/Layout';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { VideoPlayer } from '../../components/VideoPlayer';
-import { QuizWidget } from '../../components/QuizWidget';
-import { ProgressBar } from '../../components/ProgressBar';
+import VideoPlayer from '../../components/VideoPlayer';
+import QuizWidget from '../../components/QuizWidget';
+import ProgressBar from '../../components/ProgressBar';
 
 interface QuizQuestion {
   id: number;
@@ -23,8 +23,8 @@ export default function LessonPage() {
   const { id } = router.query;
   const { isAuthenticated } = useAuthStore();
   const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [nextLesson, setNextLesson] = useState<{ next_lesson: Lesson | null } | null>(null);
-  const [prevLesson, setPrevLesson] = useState<{ previous_lesson: Lesson | null } | null>(null);
+  const [nextLesson, setNextLesson] = useState<Lesson | null>(null);
+  const [prevLesson, setPrevLesson] = useState<Lesson | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'video' | 'quiz' | 'notes'>('video');
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
@@ -155,7 +155,7 @@ export default function LessonPage() {
                 <h1 className="text-2xl font-bold text-gray-900 mt-1">{lesson.title}</h1>
               </div>
               <div className="flex items-center space-x-4">
-                <ProgressBar progress={45} height="h-2" width="w-48" />
+                <ProgressBar value={45} size="sm" />
                 <span className="text-sm text-gray-600">45% complete</span>
               </div>
             </div>
@@ -167,11 +167,11 @@ export default function LessonPage() {
             <div className="lg:col-span-3 space-y-6">
               <Card className="overflow-hidden">
                 <VideoPlayer
-                  src={lesson.video_url || 'https://example.com/sample-video.mp4'}
+                  url={lesson.video_url || 'https://example.com/sample-video.mp4'}
                   lessonId={lesson.id}
                   onEnded={handleVideoEnd}
-                  onNext={() => nextLesson?.next_lesson && router.push(`/lesson/${nextLesson.next_lesson.id}`)}
-                  onPrev={() => prevLesson?.previous_lesson && router.push(`/lesson/${prevLesson.previous_lesson.id}`)}
+                  onNext={() => nextLesson && router.push(`/lesson/${nextLesson.id}`)}
+                  onPrev={() => prevLesson && router.push(`/lesson/${prevLesson.id}`)}
                 />
               </Card>
 
@@ -208,10 +208,31 @@ export default function LessonPage() {
                   )}
                   {activeTab === 'quiz' && (
                     <QuizWidget
-                      questions={quizQuestions}
-                      onComplete={handleQuizComplete}
-                      isCompleted={quizCompleted}
-                      score={quizScore}
+                      quiz={{
+                        id: lesson.id,
+                        title: 'Lesson Quiz',
+                        lesson_id: lesson.id,
+                        passing_score: 70,
+                        questions: quizQuestions.map((q, index) => ({
+                          id: q.id,
+                          quiz_id: lesson.id,
+                          question_text: q.question,
+                          question_type: 'multiple_choice' as const,
+                          options: q.options.map((opt, i) => ({
+                            id: String(i),
+                            text: opt,
+                            is_correct: i === q.correct_answer
+                          })),
+                          explanation: q.explanation,
+                          points: 1,
+                          order_index: index
+                        })),
+                        created_at: new Date().toISOString()
+                      }}
+                      onComplete={(attempt) => {
+                        setQuizScore(attempt.percentage);
+                        setQuizCompleted(true);
+                      }}
                     />
                   )}
                   {activeTab === 'notes' && (
@@ -237,16 +258,16 @@ export default function LessonPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={!prevLesson?.previous_lesson}
-                        onClick={() => prevLesson?.previous_lesson && router.push(`/lesson/${prevLesson.previous_lesson.id}`)}
+                        disabled={!prevLesson}
+                        onClick={() => prevLesson && router.push(`/lesson/${prevLesson.id}`)}
                       >
                         ← Previous
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={!nextLesson?.next_lesson}
-                        onClick={() => nextLesson?.next_lesson && router.push(`/lesson/${nextLesson.next_lesson.id}`)}
+                        disabled={!nextLesson}
+                        onClick={() => nextLesson && router.push(`/lesson/${nextLesson.id}`)}
                       >
                         Next →
                       </Button>

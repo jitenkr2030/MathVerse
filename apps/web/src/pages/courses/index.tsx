@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { courseService, Course, CourseFilters } from '../services/courses';
-import { useCourseStore } from '../store';
-import Layout from '../components/Layout';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Select } from '../components/ui/Input';
+import { courseService, Course, CourseFilters } from '../../services/courses';
+import { useCourseStore } from '../../store';
+import Layout from '../../components/Layout';
+import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Select } from '../../components/ui/Input';
 
 export default function CoursesPage() {
   const router = useRouter();
@@ -143,7 +143,7 @@ export default function CoursesPage() {
               value={`${filters.sort_by}|${filters.order}`}
               onChange={(e) => {
                 const [sort_by, order] = e.target.value.split('|');
-                setFilters((prev) => ({ ...prev, sort_by, order }));
+                setFilters((prev) => ({ ...prev, sort_by: sort_by as string, order: order as 'asc' | 'desc' }));
               }}
               className="w-48"
             />

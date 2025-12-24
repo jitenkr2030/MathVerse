@@ -3,11 +3,19 @@ import ReactPlayer from 'react-player';
 import { Play, Pause, Volume2, VolumeX, Maximize, Settings, SkipBack, SkipForward } from 'lucide-react';
 import { courseService } from '@/services/courses';
 
+interface PlayerProgress {
+  played: number;
+  playedSeconds: number;
+}
+
 interface VideoPlayerProps {
   url: string;
   lessonId: number;
   onProgress?: (progress: { played: number; playedSeconds: number }) => void;
   onComplete?: () => void;
+  onEnded?: () => void;
+  onNext?: () => void;
+  onPrev?: () => void;
   initialPosition?: number;
   autoPlay?: boolean;
 }
@@ -17,10 +25,13 @@ export default function VideoPlayer({
   lessonId,
   onProgress,
   onComplete,
+  onEnded,
+  onNext,
+  onPrev,
   initialPosition = 0,
   autoPlay = false,
 }: VideoPlayerProps) {
-  const playerRef = useRef<ReactPlayer>(null);
+  const playerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const [playing, setPlaying] = useState(autoPlay);
@@ -64,7 +75,7 @@ export default function VideoPlayer({
     }
   }, [playing]);
 
-  const handleProgress = useCallback((state: { played: number; playedSeconds: number }) => {
+  const handleProgress = useCallback((state: PlayerProgress) => {
     setPlayed(state.played);
     
     if (onProgress) {

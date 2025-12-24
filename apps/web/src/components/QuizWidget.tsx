@@ -104,7 +104,7 @@ export default function QuizWidget({ quiz, onComplete, onClose }: QuizWidgetProp
         : 'quiz-option';
     }
 
-    const correctAnswer = question.correct_answer;
+    const correctAnswer = question.options?.find(opt => opt.is_correct)?.id;
     const userAnswer = selectedAnswers[question.id];
 
     if (optionId === correctAnswer) {

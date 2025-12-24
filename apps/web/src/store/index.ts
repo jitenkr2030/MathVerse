@@ -16,9 +16,11 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
+  setIsLoading: (loading: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -27,6 +29,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+      isLoading: false,
       login: (user, token) => {
         set({ user, token, isAuthenticated: true });
       },
@@ -39,6 +42,7 @@ export const useAuthStore = create<AuthState>()(
           set({ user: { ...currentUser, ...userData } });
         }
       },
+      setIsLoading: (loading) => set({ isLoading: loading }),
     }),
     {
       name: 'mathverse-auth',
@@ -66,9 +70,11 @@ interface CourseState {
   courses: Course[];
   currentCourse: Course | null;
   enrolledCourses: Course[];
+  isLoading: boolean;
   setCourses: (courses: Course[]) => void;
   setCurrentCourse: (course: Course) => void;
   setEnrolledCourses: (courses: Course[]) => void;
+  setIsLoading: (loading: boolean) => void;
   addCourse: (course: Course) => void;
   updateCourse: (id: number, updates: Partial<Course>) => void;
 }
@@ -79,9 +85,11 @@ export const useCourseStore = create<CourseState>()(
       courses: [],
       currentCourse: null,
       enrolledCourses: [],
+      isLoading: false,
       setCourses: (courses) => set({ courses }),
       setCurrentCourse: (course) => set({ currentCourse: course }),
       setEnrolledCourses: (courses) => set({ enrolledCourses: courses }),
+      setIsLoading: (loading) => set({ isLoading: loading }),
       addCourse: (course) => {
         const courses = get().courses;
         set({ courses: [...courses, course] });

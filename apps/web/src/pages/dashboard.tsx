@@ -6,7 +6,7 @@ import { courseService, Course } from '../services/courses';
 import Layout from '../components/Layout';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { ProgressBar } from '../components/ProgressBar';
+import ProgressBar from '../components/ProgressBar';
 
 interface DashboardStats {
   totalCourses: number;
@@ -88,7 +88,7 @@ export default function DashboardPage() {
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <h1 className="text-3xl font-extrabold text-gray-900">
-              Welcome back, {user?.name?.split(' ')[0] || 'Learner'}!
+              Welcome back, {user?.full_name?.split(' ')[0] || 'Learner'}!
             </h1>
             <p className="mt-2 text-gray-600">
               Continue your mathematical journey
@@ -216,7 +216,7 @@ export default function DashboardPage() {
                             <h4 className="font-medium text-gray-900">{course.title}</h4>
                             <p className="text-sm text-gray-500">{course.subject}</p>
                             <div className="mt-2">
-                              <ProgressBar progress={Math.floor(Math.random() * 80) + 10} height="h-2" />
+                              <ProgressBar value={Math.floor(Math.random() * 80) + 10} size="sm" />
                             </div>
                           </div>
                           <div className="ml-4">

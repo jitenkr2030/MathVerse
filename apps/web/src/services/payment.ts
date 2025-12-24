@@ -77,63 +77,72 @@ class PaymentService {
    */
   async getPayments(status_filter?: string): Promise<Payment[]> {
     const params = status_filter ? { status_filter } : undefined;
-    return api.get<Payment[]>('/payments/', { params });
+    const response = await api.get<Payment[]>('/payments/', { params });
+    return response.data;
   }
 
   /**
    * Create a payment intent for course purchase
    */
   async createPayment(request: PaymentRequest): Promise<PaymentIntent> {
-    return api.post<PaymentIntent>('/payments/', request);
+    const response = await api.post<PaymentIntent>('/payments/', request);
+    return response.data;
   }
 
   /**
    * Confirm payment and enroll user
    */
   async confirmPayment(payment_id: number, payment_intent_id: string): Promise<Payment> {
-    return api.post<Payment>(`/payments/${payment_id}/confirm`, { payment_intent_id });
+    const response = await api.post<Payment>(`/payments/${payment_id}/confirm`, { payment_intent_id });
+    return response.data;
   }
 
   /**
    * Create a premium subscription
    */
   async createSubscription(request: SubscriptionRequest): Promise<Subscription> {
-    return api.post<Subscription>('/payments/subscription', request);
+    const response = await api.post<Subscription>('/payments/subscription', request);
+    return response.data;
   }
 
   /**
    * Get user's current subscription
    */
   async getSubscription(): Promise<Subscription> {
-    return api.get<Subscription>('/payments/subscription');
+    const response = await api.get<Subscription>('/payments/subscription');
+    return response.data;
   }
 
   /**
    * Cancel user's subscription
    */
   async cancelSubscription(): Promise<{ message: string; detail: string }> {
-    return api.delete<{ message: string; detail: string }>('/payments/subscription');
+    const response = await api.delete<{ message: string; detail: string }>('/payments/subscription');
+    return response.data;
   }
 
   /**
    * Get creator earnings and transaction history
    */
   async getCreatorEarnings(): Promise<CreatorEarnings> {
-    return api.get<CreatorEarnings>('/payments/earnings');
+    const response = await api.get<CreatorEarnings>('/payments/earnings');
+    return response.data;
   }
 
   /**
    * Request payout for creator earnings
    */
   async requestPayout(): Promise<{ message: string; detail: string }> {
-    return api.get<{ message: string; detail: string }>('/payments/earnings/payout');
+    const response = await api.get<{ message: string; detail: string }>('/payments/earnings/payout');
+    return response.data;
   }
 
   /**
    * Get sales data for a specific course
    */
   async getCourseSales(course_id: number): Promise<CourseSales> {
-    return api.get<CourseSales>(`/payments/sales/${course_id}`);
+    const response = await api.get<CourseSales>(`/payments/sales/${course_id}`);
+    return response.data;
   }
 
   /**
