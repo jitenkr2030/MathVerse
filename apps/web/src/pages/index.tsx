@@ -7,8 +7,8 @@ import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import Features from '../components/landing/Features';
 import Curriculum from '../components/landing/Curriculum';
-import Pricing from '../components/landing/Pricing';
 import Testimonials from '../components/landing/Testimonials';
+import Pricing from '../components/landing/Pricing';
 import CTASection from '../components/landing/CTASection';
 import Footer from '../components/landing/Footer';
 
@@ -31,8 +31,8 @@ export default function LandingPage() {
   return (
     <>
       <Head>
-        <title>MathVerse - Animation-First Mathematics Learning Platform</title>
-        <meta name="description" content="Transform your math learning experience with beautiful animations and interactive visualizations" />
+        <title>MathVerse - Where Math Comes Alive</title>
+        <meta name="description" content="Experience mathematics like never before with stunning animations, interactive visualizations, and AI-powered learning." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

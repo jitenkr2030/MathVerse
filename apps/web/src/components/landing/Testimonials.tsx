@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Quote, User } from 'lucide-react';
+import { Star, Quote } from 'lucide-react';
 
 interface Testimonial {
   id: number;
@@ -7,7 +7,6 @@ interface Testimonial {
   role: string;
   content: string;
   rating: number;
-  avatar?: string;
 }
 
 const testimonials: Testimonial[] = [
@@ -57,56 +56,47 @@ const testimonials: Testimonial[] = [
 
 const Testimonials: React.FC = () => {
   return (
-    <section className="section-py bg-slate-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="testimonials-section section">
+      <div className="section-container">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-50 border border-green-200 rounded-full mb-6">
-            <Star className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-medium text-green-700">Loved by Learners</span>
+        <div className="section-header">
+          <div className="section-badge">
+            <Star size={16} />
+            <span>Loved by Learners</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
-            Trusted by{' '}
-            <span className="gradient-text">50,000+ students</span>
+          <h2 className="section-title">
+            Trusted by <span className="hero-gradient">50,000+ students</span>
           </h2>
-          <p className="text-lg text-slate-600">
+          <p className="section-subtitle">
             Join thousands of satisfied learners who have transformed their relationship 
             with mathematics through MathVerse.
           </p>
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={testimonial.id}
-              className={`bg-white rounded-2xl p-6 border border-slate-200 card-hover reveal ${
-                index >= 3 ? 'lg:mt-6' : ''
-              }`}
-            >
+        <div className="testimonials-grid">
+          {testimonials.map((testimonial) => (
+            <div key={testimonial.id} className="testimonial-card">
               {/* Rating */}
-              <div className="flex gap-1 mb-4">
+              <div className="testimonial-rating">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                  <Star key={i} size={20} />
                 ))}
               </div>
 
               {/* Quote */}
-              <div className="relative mb-4">
-                <Quote className="w-8 h-8 text-indigo-200 absolute -top-1 -left-1" />
-                <p className="text-slate-600 leading-relaxed pl-6">
-                  {testimonial.content}
-                </p>
-              </div>
+              <p className="testimonial-content">
+                {testimonial.content}
+              </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-sky-500 rounded-full flex items-center justify-center text-white font-semibold">
+              <div className="testimonial-author">
+                <div className="testimonial-avatar">
                   {testimonial.name.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900">{testimonial.name}</div>
-                  <div className="text-sm text-slate-500">{testimonial.role}</div>
+                  <div className="testimonial-name">{testimonial.name}</div>
+                  <div className="testimonial-role">{testimonial.role}</div>
                 </div>
               </div>
             </div>
@@ -114,23 +104,23 @@ const Testimonials: React.FC = () => {
         </div>
 
         {/* Stats */}
-        <div className="mt-16 grid sm:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-indigo-600 mb-2">4.9/5</div>
-            <div className="flex justify-center mb-2">
+        <div style={{ marginTop: '80px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', fontWeight: '800', background: 'linear-gradient(135deg, #8B5CF6, #F97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>4.9/5</div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', marginBottom: '8px' }}>
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                <Star key={i} size={20} style={{ fill: '#FBBF24', color: '#FBBF24' }} />
               ))}
             </div>
-            <div className="text-slate-500">Average Rating</div>
+            <div style={{ color: '#71717A', fontSize: '15px' }}>Average Rating</div>
           </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-indigo-600 mb-2">98%</div>
-            <div className="text-slate-500">Would Recommend</div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', fontWeight: '800', background: 'linear-gradient(135deg, #10B981, #059669)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>98%</div>
+            <div style={{ color: '#71717A', fontSize: '15px', marginTop: '8px' }}>Would Recommend</div>
           </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-indigo-600 mb-2">4.8M</div>
-            <div className="text-slate-500">Lessons Completed</div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', fontWeight: '800', background: 'linear-gradient(135deg, #3B82F6, #8B5CF6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>4.8M</div>
+            <div style={{ color: '#71717A', fontSize: '15px', marginTop: '8px' }}>Lessons Completed</div>
           </div>
         </div>
       </div>
