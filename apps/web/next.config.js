@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  assetPrefix: 'https://8rbiz85j24tm.space.minimax.io',
   images: {
     unoptimized: true,
   },
