@@ -1,0 +1,165 @@
+from manim import *
+import numpy as np
+
+class {{ scene_name }}(GraphScene):
+    """
+    Graph Animation - {{ level|title }} Level
+    {% if subtitle %}Subtitle: {{ subtitle }}{% endif %}
+    """
+    
+    CONFIG = {
+        "x_min": {{ graph.x_range[0] if graph else -10 }},
+        "x_max": {{ graph.x_range[1] if graph else 10 }},
+        "y_min": {{ graph.y_range[0] if graph and graph.y_range else -10 }},
+        "y_max": {{ graph.y_range[1] if graph and graph.y_range else 10 }},
+        "x_axis_width": 8,
+        "y_axis_height": 6,
+        "graph_origin": ORIGIN,
+    }
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.colors = {
+            'primary': '{{ colors.primary }}',
+            'secondary': '{{ colors.secondary }}',
+            'text': '{{ colors.text }}',
+            'background': '{{ colors.background }}',
+            'highlight': '#EF4444',
+        }
+        
+    def construct(self):
+        # Setup axes
+        self.setup_axes()
+        
+        # Show title
+        {% if title %}
+        self.show_title("{{ title }}", "{{ subtitle or '' }}")
+        {% endif %}
+        
+        # Plot the graph
+        {% if graph and graph.equation %}
+        self.animate_graph(
+            "{{ graph.equation }}",
+            animate={{ 'true' if graph.animate else 'false' }}
+        )
+        {% endif %}
+        
+        # Add labels if specified
+        {% if graph.x_label %}
+        x_label = Text(
+            "{{ graph.x_label }}",
+            font_size=24,
+            color=self.colors['text']
+        )
+        x_label.next_to(self.x_axis.get_right(), DOWN)
+        self.play(Write(x_label))
+        {% endif %}
+        
+        {% if graph.y_label %}
+        y_label = Text(
+            "{{ graph.y_label }}",
+            font_size=24,
+            color=self.colors['text']
+        )
+        y_label.next_to(self.y_axis.get_top(), LEFT)
+        self.play(Write(y_label))
+        {% endif %}
+        
+        self.wait(2)
+    
+    def setup_axes(self):
+        """Configure and create axes"""
+        self.x_axis.color = self.colors['text']
+        self.y_axis.color = self.colors['text']
+        
+        self.x_axis.add_numbers()
+        self.y_axis.add_numbers()
+        
+        {% if graph.show_grid %}
+        self.add(self.grid)
+        {% endif %}
+        
+        self.play(Create(self.x_axis), Create(self.y_axis))
+    
+    def show_title(self, title: str, subtitle: str = ""):
+        """Display animated title"""
+        title_obj = Text(
+            title,
+            font_size=48,
+            color=self.colors['primary']
+        )
+        title_obj.to_edge(UP)
+        
+        if subtitle:
+            subtitle_obj = Text(
+                subtitle,
+                font_size=32,
+                color=self.colors['text']
+            )
+            subtitle_obj.next_to(title_obj, DOWN, buff=0.5)
+            title_group = VGroup(title_obj, subtitle_obj)
+        else:
+            title_group = title_obj
+            
+        self.play(Write(title_group))
+        self.wait(1)
+        self.title_group = title_group
+        return title_group
+    
+    def animate_graph(self, equation: str, animate: bool = True):
+        """Plot and animate the graph"""
+        # Convert equation string to lambda
+        equation_clean = equation.replace('^', '**')
+        
+        try:
+            graph = self.get_graph(
+                lambda x: eval(equation_clean),
+                color=self.colors['primary'],
+                x_min=self.x_min,
+                x_max=self.x_max
+            )
+        except:
+            # Fallback for complex equations
+            graph = self.get_graph(
+                lambda x: np.sin(x),
+                color=self.colors['primary']
+            )
+        
+        # Label for the function
+        equation_label = MathTex(
+            f"y = {equation}",
+            font_size=32,
+            color=self.colors['secondary']
+        )
+        equation_label.to_corner(UR)
+        
+        if animate:
+            self.play(
+                Create(graph),
+                Write(equation_label),
+                run_time=2
+            )
+        else:
+            self.add(graph, equation_label)
+        
+        self.wait(1)
+        
+        # Highlight a point
+        {% if graph.x_range and graph.x_range[1] > 0 %}
+        point = self.coords_to_point(
+            2,
+            eval(equation_clean.replace('x', '2'))
+        )
+        dot = Dot(point, color=self.colors['highlight'])
+        
+        self.play(FadeIn(dot))
+        
+        # Add label
+        point_label = Text(
+            f"({2}, {eval(equation_clean.replace('x', '2')):.1f})",
+            font_size=18,
+            color=self.colors['highlight']
+        )
+        point_label.next_to(dot, UR)
+        self.play(Write(point_label))
+        {% endif %}

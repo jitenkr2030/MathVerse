@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mathverse-development
+  labels:
+    app: mathverse
+    environment: development
+    managed-by: kubernetes
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mathverse-staging
+  labels:
+    app: mathverse
+    environment: staging
+    managed-by: kubernetes
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mathverse-production
+  labels:
+    app: mathverse
+    environment: production
+    managed-by: kubernetes
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mathverse-monitoring
+  labels:
+    app: mathverse
+    component: monitoring
+    managed-by: kubernetes
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mathverse-ingress
+  labels:
+    app: mathverse
+    component: ingress
+    managed-by: kubernetes

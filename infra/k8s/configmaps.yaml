@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mathverse-config
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    environment: development
+data:
+  # Service Configuration
+  SERVICE_NAME: "mathverse"
+  ENVIRONMENT: "development"
+  LOG_LEVEL: "DEBUG"
+  DEBUG: "true"
+
+  # Database Configuration (placeholders - use secrets for actual values)
+  DATABASE_HOST: "mathverse-postgres"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "mathverse_db"
+  DATABASE_SSL_MODE: "disable"
+
+  # Redis Configuration
+  REDIS_HOST: "mathverse-redis"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+
+  # JWT Configuration
+  JWT_ALGORITHM: "HS256"
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
+
+  # Feature Flags
+  ENABLE_ANALYTICS: "true"
+  ENABLE_RECOMMENDATIONS: "true"
+  ENABLE_ANIMATIONS: "true"
+
+  # CORS Configuration
+  CORS_ORIGINS: "http://localhost:3000,http://localhost:3001"
+  CORS_ALLOW_CREDENTIALS: "true"
+
+  # Rate Limiting
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_REQUESTS_PER_MINUTE: "60"
+  RATE_LIMIT_REQUESTS_PER_HOUR: "1000"
+
+  # File Upload Limits
+  MAX_FILE_SIZE_MB: "100"
+  MAX_VIDEO_SIZE_MB: "2000"
+
+  # CDN Configuration
+  CDN_URL: "https://cdn.mathverse.com"
+  VIDEO_CDN_URL: "https://videos.mathverse.com"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mathverse-config
+  namespace: mathverse-staging
+  labels:
+    app: mathverse
+    environment: staging
+data:
+  SERVICE_NAME: "mathverse"
+  ENVIRONMENT: "staging"
+  LOG_LEVEL: "INFO"
+  DEBUG: "false"
+
+  DATABASE_HOST: "mathverse-postgres"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "mathverse_db"
+  DATABASE_SSL_MODE: "require"
+
+  REDIS_HOST: "mathverse-redis"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+
+  JWT_ALGORITHM: "HS256"
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
+
+  ENABLE_ANALYTICS: "true"
+  ENABLE_RECOMMENDATIONS: "true"
+  ENABLE_ANIMATIONS: "true"
+
+  CORS_ORIGINS: "https://staging.mathverse.com,https://staging.creator.mathverse.com"
+  CORS_ALLOW_CREDENTIALS: "true"
+
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_REQUESTS_PER_MINUTE: "100"
+  RATE_LIMIT_REQUESTS_PER_HOUR: "2000"
+
+  MAX_FILE_SIZE_MB: "100"
+  MAX_VIDEO_SIZE_MB: "2000"
+
+  CDN_URL: "https://cdn.staging.mathverse.com"
+  VIDEO_CDN_URL: "https://videos.staging.mathverse.com"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mathverse-config
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    environment: production
+data:
+  SERVICE_NAME: "mathverse"
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "WARNING"
+  DEBUG: "false"
+
+  DATABASE_HOST: "mathverse-postgres"
+  DATABASE_PORT: "5432"
+  DATABASE_NAME: "mathverse_db"
+  DATABASE_SSL_MODE: "verify-full"
+
+  REDIS_HOST: "mathverse-redis"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+
+  JWT_ALGORITHM: "HS256"
+  JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
+
+  ENABLE_ANALYTICS: "true"
+  ENABLE_RECOMMENDATIONS: "true"
+  ENABLE_ANIMATIONS: "true"
+
+  CORS_ORIGINS: "https://mathverse.com,https://creator.mathverse.com"
+  CORS_ALLOW_CREDENTIALS: "true"
+
+  RATE_LIMIT_ENABLED: "true"
+  RATE_LIMIT_REQUESTS_PER_MINUTE: "200"
+  RATE_LIMIT_REQUESTS_PER_HOUR: "5000"
+
+  MAX_FILE_SIZE_MB: "100"
+  MAX_VIDEO_SIZE_MB: "5000"
+
+  CDN_URL: "https://cdn.mathverse.com"
+  VIDEO_CDN_URL: "https://videos.mathverse.com"

@@ -1,0 +1,410 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-backend
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: backend
+    environment: development
+  annotations:
+    description: "Main backend service for authentication and user management"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: backend
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-backend
+  namespace: mathverse-staging
+  labels:
+    app: mathverse
+    service: backend
+    environment: staging
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: backend
+    environment: staging
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-backend
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: backend
+    environment: production
+  annotations:
+    description: "Main backend service for authentication and user management"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: backend
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-content-metadata
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: content-metadata
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8001
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: content-metadata
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-content-metadata
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: content-metadata
+    environment: production
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8001
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: content-metadata
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-recommendation-engine
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: recommendation-engine
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8002
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: recommendation-engine
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-recommendation-engine
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: recommendation-engine
+    environment: production
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8002
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: recommendation-engine
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-video-renderer
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: video-renderer
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8003
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: video-renderer
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-video-renderer
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: video-renderer
+    environment: production
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8003
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: video-renderer
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-animation-engine
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: animation-engine
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8004
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: animation-engine
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-animation-engine
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: animation-engine
+    environment: production
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8004
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: animation-engine
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-postgres
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: postgres
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: postgres
+  selector:
+    app: mathverse
+    service: postgres
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-postgres
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: postgres
+    environment: production
+  annotations:
+    description: "PostgreSQL database for persistent storage"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+      name: postgres
+  selector:
+    app: mathverse
+    service: postgres
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-redis
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: redis
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+  selector:
+    app: mathverse
+    service: redis
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-redis
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: redis
+    environment: production
+  annotations:
+    description: "Redis cache and message broker"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+  selector:
+    app: mathverse
+    service: redis
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-web-client
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: web-client
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: web-client
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-web-client
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: web-client
+    environment: production
+  annotations:
+    description: "Main web application (Next.js)"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: web-client
+    environment: production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-creator-portal
+  namespace: mathverse-development
+  labels:
+    app: mathverse
+    service: creator-portal
+    environment: development
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3001
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: creator-portal
+    environment: development
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mathverse-creator-portal
+  namespace: mathverse-production
+  labels:
+    app: mathverse
+    service: creator-portal
+    environment: production
+  annotations:
+    description: "Creator portal for content creators (Next.js)"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3001
+      protocol: TCP
+      name: http
+  selector:
+    app: mathverse
+    service: creator-portal
+    environment: production

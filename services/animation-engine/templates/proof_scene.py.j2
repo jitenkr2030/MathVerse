@@ -1,0 +1,167 @@
+from manim import *
+
+class {{ scene_name }}():
+    """
+    Proof Animation - {{ level|title }} Level
+    {% if subtitle %}Subtitle: {{ subtitle }}{% endif %}
+    """
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.colors = {
+            'primary': '{{ colors.primary }}',
+            'secondary': '{{ colors.secondary }}',
+            'text': '{{ colors.text }}',
+            'background': '{{ colors.background }}',
+            'highlight': '#EF4444',
+        }
+        
+    def construct(self):
+        # Show title
+        {% if title %}
+        self.show_title("{{ title }}", "{{ subtitle or '' }}")
+        {% endif %}
+        
+        {% if proof_steps %}
+        # Display proof steps
+        self.display_proof({{ proof_steps }})
+        {% else %}
+        # Default proof display
+        self.display_equations({{ equations }})
+        {% endif %}
+        
+        # Conclusion
+        self.show_conclusion()
+    
+    def show_title(self, title: str, subtitle: str = ""):
+        """Display animated title"""
+        title_obj = Text(
+            title,
+            font_size=48,
+            color=self.colors['primary']
+        )
+        title_obj.to_edge(UP)
+        
+        if subtitle:
+            subtitle_obj = Text(
+                subtitle,
+                font_size=32,
+                color=self.colors['text']
+            )
+            subtitle_obj.next_to(title_obj, DOWN, buff=0.5)
+            title_group = VGroup(title_obj, subtitle_obj)
+        else:
+            title_group = title_obj
+            
+        self.play(Write(title_group))
+        self.wait(1)
+        self.title_group = title_group
+    
+    def display_proof(self, steps: list):
+        """Display mathematical proof with steps"""
+        current_y = 2
+        
+        for i, step in enumerate(steps):
+            statement = step.get('statement', '')
+            justification = step.get('justification')
+            highlight = step.get('highlight_changes', True)
+            
+            # Step number
+            step_num = Text(
+                f"Step {i + 1}",
+                font_size=20,
+                color=self.colors['secondary']
+            )
+            step_num.to_corner(UL)
+            self.play(Write(step_num))
+            
+            # Statement
+            if self.is_equation(statement):
+                stmt_obj = MathTex(
+                    statement,
+                    font_size=36,
+                    color=self.colors['text']
+                )
+            else:
+                stmt_obj = Text(
+                    statement,
+                    font_size=28,
+                    color=self.colors['text']
+                )
+            
+            stmt_obj.move_to(UP * current_y)
+            
+            self.play(Write(stmt_obj))
+            self.wait(1.5)
+            
+            # Justification
+            if justification:
+                just_obj = Text(
+                    f"Reason: {justification}",
+                    font_size=18,
+                    color=self.colors['secondary']
+                )
+                just_obj.next_to(stmt_obj, DOWN, buff=0.3)
+                self.play(Write(just_obj))
+                self.wait(1)
+            
+            current_y -= 1.5
+            
+            # Transition to next step
+            if i < len(steps) - 1:
+                arrow = Arrow(
+                    UP * (current_y + 1),
+                    UP * current_y,
+                    color=self.colors['primary']
+                )
+                self.play(Create(arrow))
+                self.wait(0.5)
+    
+    def display_equations(self, equations: list):
+        """Display equations sequentially"""
+        for i, eq in enumerate(equations):
+            if isinstance(eq, dict):
+                eq_text = eq.get('equation', str(eq))
+                if eq.get('explanation'):
+                    explanation = Text(
+                        eq['explanation'],
+                        font_size=20,
+                        color=self.colors['secondary']
+                    )
+                    explanation.next_to(eq_text_obj, DOWN)
+            else:
+                eq_text = str(eq)
+            
+            eq_obj = MathTex(eq_text, font_size=36)
+            eq_obj.move_to(ORIGIN)
+            
+            self.play(Write(eq_obj))
+            self.wait(1.5)
+            
+            if i < len(equations) - 1:
+                self.play(eq_obj.animate.shift(UP * 1.5))
+    
+    def show_conclusion(self):
+        """Show proof conclusion"""
+        conclusion = Text("Q.E.D.", font_size=64, color=self.colors['primary'])
+        conclusion.move_to(ORIGIN)
+        
+        # Background effect
+        box = SurroundingRectangle(
+            conclusion,
+            color=self.colors['primary'],
+            fill_opacity=0.1,
+            corner_radius=0.2
+        )
+        
+        self.play(
+            Create(box),
+            Write(conclusion),
+            run_time=1.5
+        )
+        self.wait(2)
+    
+    def is_equation(self, text: str) -> bool:
+        """Check if text contains mathematical notation"""
+        math_chars = ['=', '+', '-', '*', '/', '^', '∑', '∫', '∂', '√', '∞']
+        return any(char in text for char in math_chars)

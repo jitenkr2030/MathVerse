@@ -1,0 +1,317 @@
+name: MathVerse CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**.py'
+      - '**.ts'
+      - '**.tsx'
+      - '**.js'
+      - 'Dockerfile'
+      - 'requirements.txt'
+      - 'package.json'
+      - 'infra/**'
+      - 'shared/**'
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      services:
+        description: 'Services to deploy (comma-separated)'
+        required: false
+        default: 'all'
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: mathverse
+  ECS_SERVICE: mathverse-service
+  ECS_CLUSTER: mathverse-cluster
+  CONTAINER_NAME: mathverse
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - backend
+          - content-metadata
+          - recommendation-engine
+          - video-renderer
+          - animation-engine
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        if: contains(matrix.service, 'web') || contains(matrix.service, 'portal')
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: ./services/${{ matrix.service }}
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+            pip install pytest pytest-cov
+          fi
+          if [ -f package.json ]; then
+            npm ci
+          fi
+
+      - name: Run linters
+        working-directory: ./services/${{ matrix.service }}
+        run: |
+          if [ -f requirements.txt ]; then
+            black --check .
+            isort --check-only .
+            pylint --recursive=y .
+          fi
+          if [ -f package.json ]; then
+            npm run lint
+          fi
+
+      - name: Run tests
+        working-directory: ./services/${{ matrix.service }}
+        run: |
+          if [ -f pytest.ini ] || [ -f pyproject.toml ]; then
+            pytest --cov=. --cov-report=xml
+          fi
+          if [ -f package.json ]; then
+            npm test -- --coverage
+          fi
+
+      - name: Upload coverage
+        if: always()
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./services/${{ matrix.service }}/coverage.xml
+          fail_ci_if_error: false
+
+  build-and-push:
+    name: Build and Push Docker Images
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    strategy:
+      matrix:
+        service:
+          - backend
+          - content-metadata
+          - recommendation-engine
+          - video-renderer
+          - animation-engine
+          - web-client
+          - creator-portal
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        working-directory: ./services/${{ matrix.service }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY/${{ matrix.service }}:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY/${{ matrix.service }}:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY/${{ matrix.service }}:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY/${{ matrix.service }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY/${{ matrix.service }}:latest
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://staging.mathverse.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Update Kubernetes secrets
+        working-directory: ./infra/k8s
+        env:
+          NAMESPACE: mathverse-staging
+        run: |
+          kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f namespaces.yaml
+          kubectl apply -f configmaps.yaml
+          # Note: Secrets should be managed through AWS Secrets Manager
+          # kubectl apply -f secrets.yaml
+
+      - name: Update Kubernetes deployments
+        working-directory: ./infra/k8s
+        env:
+          NAMESPACE: mathverse-staging
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Update image tags in deployment files
+          for file in deployments/*.yaml; do
+            sed -i "s|image: $ECR_REGISTRY/mathverse/\([^:]*\):.*|image: $ECR_REGISTRY/mathverse/\1:$(echo $IMAGE_TAG | cut -c1-7)|g" "$file"
+            kubectl apply -f "$file" -n $NAMESPACE
+          done
+
+      - name: Verify deployment
+        env:
+          NAMESPACE: mathverse-staging
+        run: |
+          kubectl rollout status deployment/backend -n $NAMESPACE --timeout=300s
+          kubectl rollout status deployment/content-metadata -n $NAMESPACE --timeout=300s
+          kubectl get pods -n $NAMESPACE
+
+      - name: Run health check
+        run: |
+          curl -f https://staging.mathverse.com/health || exit 1
+
+  deploy-production:
+    name: Deploy to Production
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://mathverse.com
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Update Kubernetes secrets
+        working-directory: ./infra/k8s
+        env:
+          NAMESPACE: mathverse-production
+        run: |
+          kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f namespaces.yaml
+          kubectl apply -f configmaps.yaml
+
+      - name: Update Kubernetes deployments
+        working-directory: ./infra/k8s
+        env:
+          NAMESPACE: mathverse-production
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          # Update image tags to latest
+          for file in deployments/*.yaml; do
+            sed -i "s|image: $ECR_REGISTRY/mathverse/\([^:]*\):.*|image: $ECR_REGISTRY/mathverse/\1:latest|g" "$file"
+            kubectl apply -f "$file" -n $NAMESPACE
+          done
+
+      - name: Verify deployment
+        env:
+          NAMESPACE: mathverse-production
+        run: |
+          kubectl rollout status deployment/backend -n $NAMESPACE --timeout=600s
+          kubectl rollout status deployment/content-metadata -n $NAMESPACE --timeout=600s
+          kubectl get pods -n $NAMESPACE
+
+      - name: Run health check
+        run: |
+          curl -f https://mathverse.com/health || exit 1
+
+      - name: Notify deployment
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "MathVerse deployed to production",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*MathVerse Production Deployment* :rocket:\nVersion: ${{ github.sha | slice:0:7 }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  notify-failure:
+    name: Notify on Failure
+    needs: [lint-and-test, deploy-staging, deploy-production]
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "MathVerse CI/CD Pipeline Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*MathVerse CI/CD Pipeline Failed* :x:\nJob: ${{ github.workflow }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

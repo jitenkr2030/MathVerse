@@ -1,0 +1,220 @@
+from manim import *
+import numpy as np
+
+class {{ scene_name }}(Scene):
+    """
+    {{ title }} - {{ level|title }} Level Animation
+    {% if subtitle %}Subtitle: {{ subtitle }}{% endif %}
+    """
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # MathVerse brand colors
+        self.colors = {
+            'primary': '{{ colors.primary }}',
+            'secondary': '{{ colors.secondary }}',
+            'text': '{{ colors.text }}',
+            'background': '{{ colors.background }}',
+            'highlight': '#EF4444',
+        }
+        
+    def construct(self):
+        # Show title
+        {% if title %}
+        self.show_title("{{ title }}", "{{ subtitle or '' }}")
+        {% endif %}
+        
+        # Display equations
+        {% if equations %}
+        self.display_equations({{ equations }})
+        {% endif %}
+        
+        {% if graph %}
+        self.display_graph(
+            "{{ graph.equation }}",
+            x_range={{ graph.x_range }},
+            y_range={{ graph.y_range or 'None' }},
+            show_grid={{ 'true' if graph.show_grid else 'false' }}
+        )
+        {% endif %}
+        
+        {% if shapes %}
+        self.display_shapes({{ shapes }})
+        {% endif %}
+        
+        {% if proof_steps %}
+        self.display_proof_steps({{ proof_steps }})
+        {% endif %}
+        
+        # End scene
+        self.wait(2)
+    
+    def show_title(self, title: str, subtitle: str = ""):
+        """Display animated title and optional subtitle"""
+        title_obj = Text(
+            title,
+            font_size=48,
+            color=self.colors['primary']
+        )
+        title_obj.to_edge(UP)
+        
+        if subtitle:
+            subtitle_obj = Text(
+                subtitle,
+                font_size=32,
+                color=self.colors['text']
+            )
+            subtitle_obj.next_to(title_obj, DOWN, buff=0.5)
+            title_group = VGroup(title_obj, subtitle_obj)
+        else:
+            title_group = title_obj
+            
+        self.play(Write(title_group))
+        self.wait(1)
+        self.title_group = title_group
+        return title_group
+    
+    def display_equations(self, equations: list):
+        """Display list of equations"""
+        for i, eq in enumerate(equations):
+            eq_obj = MathTex(
+                str(eq),
+                font_size=36,
+                color=self.colors['text']
+            )
+            eq_obj.move_to(ORIGIN)
+            
+            self.play(Write(eq_obj))
+            self.wait(1)
+            
+            if i < len(equations) - 1:
+                self.play(eq_obj.animate.shift(UP * 2))
+    
+    def display_graph(
+        self,
+        equation: str,
+        x_range: list = [-10, 10],
+        y_range: list = None,
+        show_grid: bool = True
+    ):
+        """Display mathematical graph"""
+        # Create axes
+        axes = Axes(
+            x_range=x_range,
+            y_range=y_range or [-10, 10, 1],
+            axis_config={
+                "color": self.colors['text'],
+                "include_tip": True,
+            },
+            x_length=8,
+            y_length=6,
+        )
+        
+        # Add labels
+        x_label = Text("x", font_size=24, color=self.colors['text'])
+        y_label = Text("y", font_size=24, color=self.colors['text'])
+        
+        axes.add(x_label, y_label)
+        
+        # Create graph
+        graph = axes.plot(
+            lambda x: eval(equation.replace('^', '**')),
+            color=self.colors['primary'],
+            x_range=x_range,
+        )
+        
+        # Animate
+        self.play(Create(axes))
+        self.play(Create(graph))
+        self.wait(2)
+    
+    def display_shapes(self, shapes: list):
+        """Display geometry shapes"""
+        for shape_data in shapes:
+            shape_type = shape_data.get('shape_type', 'circle')
+            params = shape_data.get('parameters', {})
+            position = shape_data.get('position', [0, 0])
+            color = shape_data.get('color', self.colors['primary'])
+            label = shape_data.get('label')
+            
+            if shape_type == 'circle':
+                shape = Circle(
+                    radius=params.get('radius', 1),
+                    color=color,
+                    fill_opacity=0.3
+                )
+            elif shape_type == 'rectangle':
+                shape = Rectangle(
+                    width=params.get('width', 2),
+                    height=params.get('height', 2),
+                    color=color,
+                    fill_opacity=0.3
+                )
+            elif shape_type == 'triangle':
+                shape = Triangle(
+                    color=color,
+                    fill_opacity=0.3
+                )
+            else:
+                shape = Circle(radius=1, color=color, fill_opacity=0.3)
+            
+            shape.move_to(np.array(position))
+            
+            self.play(Create(shape))
+            self.wait(1)
+            
+            if label:
+                label_obj = Text(
+                    label,
+                    font_size=20,
+                    color=self.colors['text']
+                )
+                label_obj.next_to(shape, DOWN)
+                self.play(Write(label_obj))
+    
+    def display_proof_steps(self, steps: list):
+        """Display mathematical proof steps"""
+        for i, step in enumerate(steps):
+            # Show step number
+            step_num = Text(
+                f"Step {i + 1}",
+                font_size=24,
+                color=self.colors['secondary']
+            )
+            step_num.to_corner(UL)
+            self.play(Write(step_num))
+            
+            # Show statement
+            statement = Text(
+                step.get('statement', ''),
+                font_size=28,
+                color=self.colors['text']
+            )
+            statement.move_to(ORIGIN)
+            
+            self.play(Write(statement))
+            self.wait(2)
+            
+            # Show justification if present
+            justification = step.get('justification')
+            if justification:
+                just_obj = Text(
+                    f"Because: {justification}",
+                    font_size=20,
+                    color=self.colors['secondary']
+                )
+                just_obj.next_to(statement, DOWN, buff=0.5)
+                self.play(Write(just_obj))
+            
+            self.wait(1)
+            
+            # Fade out for next step
+            self.play(FadeOut(step_num), FadeOut(statement))
+            if justification:
+                self.play(FadeOut(just_obj))
+        
+        # Final message
+        final = Text("Q.E.D.", font_size=48, color=self.colors['primary'])
+        final.move_to(ORIGIN)
+        self.play(Write(final))
+        self.wait(2)
