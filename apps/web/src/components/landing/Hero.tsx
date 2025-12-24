@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight, Play, TrendingUp, Users, Sparkles } from 'lucide-react';
+import { ArrowRight, Play, TrendingUp, Users, Star, Award } from 'lucide-react';
 
 interface HeroProps {
   onGetStarted?: () => void;
@@ -14,9 +13,9 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => {
   }, []);
 
   const stats = [
-    { value: '50K+', label: 'Active Learners' },
-    { value: '500+', label: 'Video Lessons' },
-    { value: '95%', label: 'Completion Rate' },
+    { value: '10K+', label: 'Active Students', icon: Users },
+    { value: '500+', label: 'Interactive Lessons', icon: Star },
+    { value: '95%', label: 'Success Rate', icon: Award },
   ];
 
   return (
@@ -34,26 +33,26 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => {
         <div className="hero-content">
           {/* Badge */}
           <div className="hero-badge">
-            <span className="hero-badge-dot" />
-            <span>New: AI-Powered Tutoring</span>
+            <span style={{ fontSize: '16px' }}>✦</span>
+            <span>Start Your Journey</span>
           </div>
 
           {/* Headline */}
           <h1 className="hero-title">
-            Experience Math<br />
-            <span className="hero-gradient">Like Never Before</span>
+            Ready to Discover the <br />
+            <span className="hero-gradient">Beauty of Mathematics</span>
           </h1>
 
           {/* Subheadline */}
           <p className="hero-subtitle">
-            Watch abstract mathematical concepts come to life with stunning animations. 
-            From calculus to linear algebra, master mathematics through visual storytelling.
+            Join thousands of students who are transforming their understanding 
+            of mathematics through our interactive, visual approach to learning.
           </p>
 
           {/* CTA Buttons */}
           <div className="hero-buttons">
             <button onClick={onGetStarted} className="btn btn-primary btn-glow">
-              Start Learning Free
+              Start Free Trial
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14"/>
                 <path d="m12 5 7 7-7 7"/>
@@ -76,14 +75,18 @@ const Hero: React.FC<HeroProps> = ({ onGetStarted }) => {
           </div>
 
           {/* Social Proof */}
-          <div style={{ marginTop: '32px', paddingTop: '32px', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
-            <p style={{ fontSize: '14px', color: '#71717A', marginBottom: '16px' }}>Trusted by students from</p>
-            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', fontSize: '14px', fontWeight: '600', color: '#52525B' }}>
-              <span>MIT</span>
-              <span>Stanford</span>
-              <span>Harvard</span>
-              <span>Cambridge</span>
-              <span>+ 500 schools</span>
+          <div className="hero-social-proof">
+            <p className="hero-social-proof-text">Trusted by 10,000+ students worldwide</p>
+            <div className="hero-social-proof-logos">
+              <span className="hero-trusted-item">MIT</span>
+              <span className="hero-trusted-divider">•</span>
+              <span className="hero-trusted-item">Stanford</span>
+              <span className="hero-trusted-divider">•</span>
+              <span className="hero-trusted-item">Harvard</span>
+              <span className="hero-trusted-divider">•</span>
+              <span className="hero-trusted-item">Cambridge</span>
+              <span className="hero-trusted-divider">•</span>
+              <span className="hero-trusted-item">500+ Schools</span>
             </div>
           </div>
         </div>

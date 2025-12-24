@@ -1820,3 +1820,38 @@ body {
   font-size: 14px;
   color: var(--text-muted);
 }
+
+
+/* Hero Social Proof */
+.hero-social-proof {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hero-social-proof-text {
+  font-size: 14px;
+  color: #71717A;
+  margin-bottom: 16px;
+}
+
+.hero-social-proof-logos {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  font-weight: 600;
+  color: #52525B;
+}
+
+.hero-trusted-item {
+  transition: color 0.3s ease;
+}
+
+.hero-trusted-item:hover {
+  color: var(--primary-light);
+}
+
+.hero-trusted-divider {
+  color: rgba(255, 255, 255, 0.2);
+}
