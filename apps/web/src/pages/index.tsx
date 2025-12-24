@@ -9,6 +9,7 @@ import Features from '../components/landing/Features';
 import Curriculum from '../components/landing/Curriculum';
 import Testimonials from '../components/landing/Testimonials';
 import Pricing from '../components/landing/Pricing';
+import AppPreview from '../components/landing/AppPreview';
 import CTASection from '../components/landing/CTASection';
 import Footer from '../components/landing/Footer';
 
@@ -43,6 +44,7 @@ export default function LandingPage() {
         <Curriculum />
         <Testimonials />
         <Pricing />
+        <AppPreview />
         <CTASection onGetStarted={handleGetStarted} />
         <Footer />
       </div>

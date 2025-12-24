@@ -16,15 +16,18 @@ const Footer: React.FC = () => {
 
   const footerLinks = {
     product: [
-      { label: 'Features', href: '/features', icon: Sparkles },
+      { label: 'Features', href: '/features' },
       { label: 'Pricing', href: '/pricing' },
       { label: 'For Schools', href: '/education' },
       { label: 'For Creators', href: '/creator' },
-      { label: 'API Documentation', href: '/docs' },
     ],
-    resources: [
+    apiDocumentation: [
+      { label: 'API Documentation', href: '/docs' },
+      { label: 'Resources', href: '/resources' },
       { label: 'Math Blog', href: '/blog' },
       { label: 'Help Center', href: '/help' },
+    ],
+    community: [
       { label: 'Community', href: '/community' },
       { label: 'Tutorials', href: '/tutorials' },
       { label: 'Research', href: '/research' },
@@ -40,7 +43,6 @@ const Footer: React.FC = () => {
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Terms of Service', href: '/terms' },
       { label: 'Cookie Policy', href: '/cookies' },
-      { label: 'GDPR', href: '/gdpr' },
     ],
   };
 
@@ -53,7 +55,7 @@ const Footer: React.FC = () => {
 
   const FooterLinkColumn: React.FC<{ 
     title: string; 
-    links: { label: string; href: string; icon?: React.ElementType }[] 
+    links: { label: string; href: string }[] 
   }> = ({ title, links }) => (
     <motion.div 
       className="footer-column"
@@ -62,7 +64,7 @@ const Footer: React.FC = () => {
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
     >
-      <h3 className="footer-column-title">{title}</h3>
+      <h3 className="footer-title">{title}</h3>
       <ul className="footer-links">
         {links.map((link, index) => (
           <motion.li 
@@ -73,9 +75,7 @@ const Footer: React.FC = () => {
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
             <Link href={link.href} className="footer-link">
-              {link.icon && <link.icon className="footer-link-icon" />}
-              <span>{link.label}</span>
-              <ArrowRight className="footer-link-arrow" />
+              {link.label}
             </Link>
           </motion.li>
         ))}
@@ -84,14 +84,7 @@ const Footer: React.FC = () => {
   );
 
   return (
-    <footer className="footer">
-      {/* Background decoration */}
-      <div className="footer-bg">
-        <div className="footer-gradient"></div>
-        <div className="footer-pattern"></div>
-      </div>
-      
-      {/* Main Footer Content */}
+    <footer className="footer-section">
       <div className="footer-container">
         {/* Newsletter Section */}
         <motion.div 
@@ -104,12 +97,12 @@ const Footer: React.FC = () => {
           <div className="footer-newsletter-content">
             <div className="footer-brand">
               <Link href="/" className="footer-logo">
-                <div className="footer-logo-icon">
-                  <span className="footer-logo-symbol">∫</span>
+                <div className="logo-icon">
+                  <span style={{ fontSize: '24px', fontWeight: 'bold' }}>∫</span>
                 </div>
-                <span className="footer-logo-text">MathVerse</span>
+                <span className="logo-text">MathVerse</span>
               </Link>
-              <p className="footer-tagline">
+              <p className="footer-description">
                 Making mathematics beautiful, intuitive, and accessible through 
                 world-class animation technology.
               </p>
@@ -117,7 +110,7 @@ const Footer: React.FC = () => {
             
             <div className="footer-newsletter-form">
               <div className="footer-newsletter-input-wrapper">
-                <Mail className="footer-newsletter-icon" />
+                <Mail size={20} className="footer-newsletter-icon" />
                 <input
                   type="email"
                   placeholder="Enter your email for updates"
@@ -125,7 +118,7 @@ const Footer: React.FC = () => {
                 />
                 <button className="footer-newsletter-button">
                   <span>Subscribe</span>
-                  <ArrowRight className="footer-newsletter-button-icon" />
+                  <ArrowRight size={18} className="footer-newsletter-button-icon" />
                 </button>
               </div>
               <p className="footer-newsletter-note">
@@ -137,9 +130,10 @@ const Footer: React.FC = () => {
         
         {/* Links Section */}
         <div className="footer-links-section">
-          <div className="footer-links-grid">
+          <div className="footer-grid">
             <FooterLinkColumn title="Product" links={footerLinks.product} />
-            <FooterLinkColumn title="Resources" links={footerLinks.resources} />
+            <FooterLinkColumn title="API Documentation" links={footerLinks.apiDocumentation} />
+            <FooterLinkColumn title="Community" links={footerLinks.community} />
             <FooterLinkColumn title="Company" links={footerLinks.company} />
             
             {/* Social Column */}
@@ -150,8 +144,8 @@ const Footer: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5 }}
             >
-              <h3 className="footer-column-title">Connect</h3>
-              <div className="footer-social-links">
+              <h3 className="footer-title">Connect</h3>
+              <div className="footer-social">
                 {socialLinks.map((social, index) => (
                   <motion.a
                     key={social.label}
@@ -167,7 +161,7 @@ const Footer: React.FC = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <social.icon className="footer-social-icon" />
+                    <social.icon size={20} />
                   </motion.a>
                 ))}
               </div>
