@@ -1,4 +1,4 @@
-// Generate complete Tailwind CSS
+// Generate complete Tailwind CSS + Custom Landing Page CSS
 const fs = require('fs');
 const path = require('path');
 
@@ -641,3 +641,14 @@ console.log(`\nGenerated complete CSS file: ${outputPath}`);
 console.log(`File size: ${(css.length / 1024).toFixed(2)} KB`);
 console.log(`Total classes processed: ${allClasses.size}`);
 console.log(`CSS classes generated: ${count}`);
+
+// Now append the custom landing.css content
+const landingCSSPath = './src/components/landing/landing.css';
+if (fs.existsSync(landingCSSPath)) {
+  const landingCSS = fs.readFileSync(landingCSSPath, 'utf8');
+  fs.appendFileSync(outputPath, '\n\n/* Custom Landing Page Styles */\n' + landingCSS);
+  console.log(`\nAppended custom landing CSS from: ${landingCSSPath}`);
+  console.log(`Final file size: ${(fs.statSync(outputPath).size / 1024).toFixed(2)} KB`);
+} else {
+  console.log(`\nWarning: Custom landing CSS file not found at ${landingCSSPath}`);
+}

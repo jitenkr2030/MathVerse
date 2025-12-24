@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   
-  const url = 'https://wr2ifrnk1v3d.space.minimax.io';
+  const url = 'https://625bjbqiyeks.space.minimax.io';
   
   console.log(`\n=== Testing Landing Page: ${url} ===\n`);
   
