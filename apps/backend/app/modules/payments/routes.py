@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select, func, and_
 import stripe
 import uuid
+import os
 
 from app.database import get_db
 from app.models import Payment, Course, User, Enrollment, UserRole, Subscription
@@ -25,8 +26,8 @@ from app.dependencies import get_current_user, get_or_404
 router = APIRouter()
 
 
-# Initialize Stripe (will use config settings in production)
-stripe.api_key = None  # Set from environment in production
+# Initialize Stripe from environment
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 
 @router.get("/", response_model=List[PaymentResponse])
@@ -359,8 +360,8 @@ async def get_creator_earnings(
         })
     
     return CreatorEarningsResponse(
-        total_earnings=total_earnings * 0.70,  # 70% revenue_earnings= share
-        pendingpending_earnings * 0.70,
+        total_earnings=total_earnings * 0.70,  # 70% revenue share for creators
+        pending_earnings=pending_earnings * 0.70,
         paid_earnings=0,  # Would track paid amounts
         this_month_earnings=this_month_earnings * 0.70,
         transactions=transaction_list

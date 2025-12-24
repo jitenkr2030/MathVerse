@@ -1,4 +1,11 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+// Build URL to avoid double /api paths
+const buildApiUrl = (endpoint: string): string => {
+  const baseUrl = API_BASE_URL.replace(/\/api\/?$/, ''); // Remove trailing /api if present
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+  return `${baseUrl}/${cleanEndpoint}`;
+};
 
 interface ApiOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -20,7 +27,7 @@ class ApiClient {
   }
 
   private buildUrl(endpoint: string, params?: Record<string, any>): string {
-    const url = new URL(`${this.baseUrl}${endpoint}`, window.location.origin);
+    const url = new URL(`${buildApiUrl(endpoint)}`, window.location.origin);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
