@@ -1,9 +1,35 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  safelist: [
+    // Typography
+    'text-4xl', 'text-5xl', 'text-6xl', 'text-sm', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl',
+    'text-slate-900', 'text-slate-600', 'text-slate-500', 'text-slate-400', 'text-slate-300', 'text-white', 'text-indigo-600', 'text-gray-900', 'text-gray-600', 'text-gray-500', 'text-gray-400', 'text-amber-400', 'text-green-500', 'text-red-500',
+    'font-bold', 'font-semibold', 'font-medium',
+    'leading-tight', 'leading-relaxed',
+    // Spacing
+    'mb-6', 'mb-8', 'mb-12', 'mb-16', 'mt-8', 'mt-16', 'pt-8', 'p-4', 'p-6', 'p-8', 'px-4', 'px-6', 'px-8', 'py-4', 'py-2', 'py-3',
+    // Layout
+    'flex', 'grid', 'block', 'inline-flex', 'items-center', 'justify-center', 'justify-between', 'gap-4', 'gap-6', 'gap-8',
+    'w-full', 'h-full', 'w-12', 'h-12', 'w-10', 'h-10',
+    'max-w-7xl', 'max-w-3xl', 'max-w-xl',
+    // Backgrounds
+    'bg-white', 'bg-slate-50', 'bg-slate-900', 'bg-slate-800', 'bg-indigo-600', 'bg-indigo-50', 'bg-gray-100', 'bg-amber-50', 'bg-green-50', 'bg-emerald-600', 'bg-gradient-to-br', 'bg-gradient-to-r',
+    // Borders
+    'border', 'border-2', 'border-slate-200', 'border-slate-900', 'border-indigo-500', 'border-white',
+    // Effects
+    'shadow-lg', 'shadow-xl', 'shadow-2xl', 'shadow', 'shadow-md',
+    'rounded-xl', 'rounded-2xl', 'rounded-3xl', 'rounded-lg', 'rounded-full', 'rounded',
+    // Transitions
+    'transition-all', 'transition-colors', 'transition-shadow', 'duration-200', 'duration-300',
+    // Hover states
+    'hover:bg-slate-100', 'hover:bg-indigo-700', 'hover:text-indigo-600', 'hover:text-white', 'hover:shadow-xl',
+    // Responsive
+    'sm:', 'lg:', 'xl:', 'md:',
   ],
   theme: {
     extend: {
