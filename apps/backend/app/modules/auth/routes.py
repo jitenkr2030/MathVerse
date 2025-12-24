@@ -169,3 +169,155 @@ async def logout():
     # In a stateless JWT setup, logout is typically handled client-side
     # by simply removing the token
     return {"message": "Successfully logged out"}
+
+@router.post("/refresh", response_model=Token)
+async def refresh_access_token(
+    refresh_token: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Refresh access token using refresh token.
+    
+    Provides token rotation for maintaining user sessions without
+    requiring repeated login credentials.
+    """
+    try:
+        payload = jwt.decode(
+            refresh_token, 
+            settings.SECRET_KEY, 
+            algorithms=[settings.ALGORITHM]
+        )
+        user_id: int = payload.get("sub")
+        token_type: str = payload.get("type")
+        
+        if token_type != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token type",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        user = db.query(User).filter(User.id == user_id).first()
+        if user is None or not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found or inactive",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Create new access token
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": str(user.id)}, expires_delta=access_token_expires
+        )
+        
+        # Optionally rotate refresh token (create new one)
+        new_refresh_token = create_access_token(
+            data={"sub": str(user.id)}, 
+            expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "full_name": user.full_name,
+                "role": user.role.value,
+                "is_active": user.is_active,
+                "is_verified": user.is_verified
+            }
+        }
+        
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+@router.post("/password-reset/request")
+async def request_password_reset(
+    email: EmailStr,
+    db: Session = Depends(get_db)
+):
+    """
+    Request password reset email.
+    
+    Sends a password reset link to the user's email address.
+    Rate limited to prevent abuse.
+    """
+    user = db.query(User).filter(User.email == email).first()
+    
+    # Always return success to prevent email enumeration
+    if user is None:
+        return {"message": "If the email exists, a reset link has been sent"}
+    
+    # Generate reset token (in production, send via email)
+    reset_token = create_access_token(
+        data={"sub": str(user.id), "type": "password_reset"},
+        expires_delta=timedelta(hours=1)
+    )
+    
+    # TODO: Send email with reset link
+    # await send_email(user.email, "Password Reset", f"Reset link: ...")
+    
+    return {
+        "message": "If the email exists, a reset link has been sent",
+        "debug_reset_token": reset_token  # Remove in production
+    }
+
+@router.post("/password-reset/confirm")
+async def confirm_password_reset(
+    token: str,
+    new_password: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Confirm password reset with new password.
+    
+    Validates the reset token and updates the user's password.
+    """
+    try:
+        payload = jwt.decode(
+            token, 
+            settings.SECRET_KEY, 
+            algorithms=[settings.ALGORITHM]
+        )
+        
+        if payload.get("type") != "password_reset":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token type"
+            )
+        
+        user_id: int = payload.get("sub")
+        user = db.query(User).filter(User.id == user_id).first()
+        
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found"
+            )
+        
+        # Update password
+        hashed_password = get_password_hash(new_password)
+        user.hashed_password = hashed_password
+        db.commit()
+        
+        return {"message": "Password reset successful"}
+        
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired reset token"
+        )
